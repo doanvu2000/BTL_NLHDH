@@ -1,0 +1,30 @@
+
+public class TienTrinh {
+	private int Txh;
+	private int CPUb;
+	private int index;
+	public TienTrinh(int txh, int cPUb, int index) {
+		Txh = txh;
+		CPUb = cPUb;
+		this.index = index;
+	}
+	public int getTxh() {
+		return Txh;
+	}
+	public void setTxh(int txh) {
+		Txh = txh;
+	}
+	public int getCPUb() {
+		return CPUb;
+	}
+	public void setCPUb(int cPUb) {
+		CPUb = cPUb;
+	}
+	public int getIndex() {
+		return index;
+	}
+	public void setIndex(int index) {
+		this.index = index;
+	}
+	
+}

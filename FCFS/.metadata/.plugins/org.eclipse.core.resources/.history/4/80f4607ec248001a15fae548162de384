@@ -1,0 +1,84 @@
+import java.util.ArrayList;
+
+public class Main {
+
+	public static ArrayList<TienTrinh> list = new ArrayList<TienTrinh>();
+
+	public static void main(String[] args) {
+		list.add(new TienTrinh(8, 4, 1));
+		list.add(new TienTrinh(3, 11, 2));
+		list.add(new TienTrinh(5, 6, 3));
+		list.add(new TienTrinh(4, 9, 4));
+		list.add(new TienTrinh(15, 2, 5));
+		list.add(new TienTrinh(9, 7, 6));
+		list.add(new TienTrinh(0, 14, 7));
+		list.add(new TienTrinh(11, 8, 8));
+		// end input
+		int Txh = 0, Tkt = 0;
+		System.out.println("Giản đồ Gantt: ");
+		System.out.print("\t|");
+		if (check()) {// tat ca xuat hien cung nhau
+			sortByCPUb();// sap xep theo thu tu CPU Burst_Time
+			int n = list.size();
+			for (int i = 0; i < n; i++) {
+				Tkt += list.get(i).getCPUb();
+				System.out.print(Txh + " P"+list.get(i).getIndex()+" "+Tkt+"|");
+				list.get(i).setTime_Wait(Txh-list.get(i).getTxh());
+				list.get(i).setTime_Processing(list.get(i).getTime_Wait()+list.get(i).getCPUb());
+				Txh = Tkt;
+			}
+		}else {
+			sortByTxh();
+			int n = list.size();
+			for (int i = 0; i < n; i++) {
+				Tkt += list.get(i).getCPUb();
+				System.out.print(Txh + " P"+list.get(i).getIndex()+" "+Tkt+"|");
+				list.get(i).setTime_Wait(Txh-list.get(i).getTxh());
+				list.get(i).setTime_Processing(list.get(i).getTime_Wait()+list.get(i).getCPUb());
+				Txh = Tkt;
+			}
+		}
+		System.out.println();System.out.println();
+		System.out.println("\tThời gian đợi TB của hệ tiến trình: \n");
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println("\t-Thời gian đợi của P"+list.get(i).getIndex()+" "+list.get(i).getTime_Wait());
+		}
+		System.out.println();System.out.println();
+		System.out.println("\tThời gian xử lý TB của hệ tiến trình: \n");
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println("\t-Thời gian đợi của P"+list.get(i).getIndex()+" "+list.get(i).getTime_Processing());
+		}
+	}
+
+	public static boolean check() {// TH ĐB: tất cả Txh = nhau ( coi như = 0 )
+		for (int i = 1; i < list.size(); i++) {
+			if (list.get(i).getTxh() != list.get(0).getTxh())
+				return false;
+		}
+		return true;
+	}
+
+	public static void sortByTxh() {
+		for (int i = 0; i < list.size() - 1; i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				if (list.get(i).getTxh() > list.get(j).getTxh()) {
+					TienTrinh x = list.get(i);
+					list.set(i, list.get(j));
+					list.set(j, x);
+				}
+			}
+		}
+	}
+
+	public static void sortByCPUb() {
+		for (int i = 0; i < list.size() - 1; i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				if (list.get(i).getCPUb() > list.get(j).getCPUb()) {
+					TienTrinh x = list.get(i);
+					list.set(i, list.get(j));
+					list.set(j, x);
+				}
+			}
+		}
+	}
+}
