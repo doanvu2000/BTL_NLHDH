@@ -3,12 +3,15 @@ public class TienTrinh {
 	private int Txh;
 	private int CPUb;
 	private int index;
-	private int time_Wait;
-	private int time_Processing;
+	private int time_Start, time_Finish;
+	
 	public TienTrinh(int cPUb, int txh, int index) {
 		Txh = txh;
 		CPUb = cPUb;
 		this.index = index;
+	}
+	public TienTrinh() {
+		Txh = CPUb = index =  0;
 	}
 	public int getTxh() {
 		return Txh;
@@ -28,17 +31,16 @@ public class TienTrinh {
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	public int getTime_Wait() {
-		return time_Wait;
+	public int getTime_Start() {
+		return time_Start;
 	}
-	public void setTime_Wait(int time_Wait) {
-		this.time_Wait = time_Wait;
+	public void setTime_Start(int time_Start) {
+		this.time_Start = time_Start;
 	}
-	public int getTime_Processing() {
-		return time_Processing;
+	public int getTime_Finish() {
+		return time_Finish;
 	}
-	public void setTime_Processing(int time_Processing) {
-		this.time_Processing = time_Processing;
+	public void setTime_Finish(int time_Finish) {
+		this.time_Finish = time_Finish;
 	}
-	
 }

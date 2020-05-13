@@ -1,0 +1,238 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+
+	public static ArrayList<TienTrinh> list = new ArrayList<TienTrinh>();
+	static Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) {
+		// input
+		 nhap();
+		// -----------------------------------
+		list.add(new TienTrinh(8, 5, 1));
+		list.add(new TienTrinh(1, 16, 2));
+		list.add(new TienTrinh(6, 6, 3));
+		list.add(new TienTrinh(2, 14, 4));
+		list.add(new TienTrinh(5, 8, 5));
+		list.add(new TienTrinh(4, 11, 6));
+		list.add(new TienTrinh(11, 3, 7));
+		list.add(new TienTrinh(15, 0, 8));
+		list.add(new TienTrinh(5, 9, 9));
+		list.add(new TienTrinh(12, 2, 10));
+		// ------------------------------------
+		// end input
+		FCFS();
+	}
+
+	public static void FCFS() {
+		int Txh = 0, Tkt = 0;
+		System.out
+				.println("\n\n\t=================================LẬP LỊCH CPU FCFS================================\n");
+		System.out.println("\n\t\tBẢNG TIẾN TRÌNH BAN ĐẦU: \n");
+		showTable();
+		System.out.println("\n\t\tBẢNG TIẾN TRÌNH SAU KHI SẮP XẾP THEO TXH: \n");
+		sortByTxh();
+		showTable();
+
+//		{-----------------------------------------------------------------------------------------------------------------------}
+
+		System.out.println("\tGiản đồ Gantt: \n");
+		System.out.print("\t|");
+		if (check()) {// tat ca xuat hien cung nhau
+			sortByCPUb();// sap xep theo thu tu CPU Burst_Time
+			int n = list.size();
+			for (int i = 0; i < n; i++) {
+				Tkt += list.get(i).getCPUb();
+				System.out.print(Txh + " P" + list.get(i).getIndex() + " " + Tkt + "|");
+				list.get(i).setTime_Start(Txh);// set thời điểm bắt đầu thực hiện của tiến trình
+				list.get(i).setTime_Finish(Tkt);// set thời điểm kết thúc của tiến trình
+				Txh = Tkt;
+			}
+		} else {// thoi gian xuat hien cua cac tien trinh la khac nhau
+				// sortByTxh();//sap xep theo thoi gian xuat hien
+			int n = list.size();
+			Txh = list.get(0).getTxh();
+			for (int i = 0; i < n; i++) {
+				Tkt += list.get(i).getCPUb();
+				System.out.print(Txh + " P" + list.get(i).getIndex() + " " + Tkt + "|");
+				list.get(i).setTime_Start(Txh);// set thời điểm bắt đầu thực hiện của tiến trình
+				list.get(i).setTime_Finish(Tkt);// set thời điểm kết thúc của tiến trình
+				if (i + 1 < n && Tkt < list.get(i + 1).getTxh()) {// tiến trình sau chưa xuất hiện khi tiến trình i kết
+																	// thúc
+					Tkt = list.get(i + 1).getTxh();
+				}
+				Txh = Tkt; // set lại mốc bắt đầu cho tiến trình tiếp theo
+			}
+		}
+		System.out.println();
+		System.out.println();
+
+//		{-----------------------------------------------------------------------------------------------------------------------}
+
+		System.out.println("\t\t===============Thời gian đợi TB của hệ tiến trình================\n");
+		float sum = 0; // tổng thời gian đợi
+		String TimeTB = ""; // Biểu thức tổng thời gian đợi
+		for (int i = 0; i < list.size(); i++) {
+			int start = list.get(i).getTime_Start();
+			System.out.println("\t\t-Thời gian đợi của P" + list.get(i).getIndex() + " =  " + start + " - "
+					+ list.get(i).getTxh() + " = " + (start - list.get(i).getTxh()));
+			sum += (start - list.get(i).getTxh());
+			if (i != list.size() - 1)
+				TimeTB += (start - list.get(i).getTxh()) + " + ";
+			else
+				TimeTB += (start - list.get(i).getTxh());
+		}
+		System.out.print("\n\t\tThời gian đợi trung bình của hệ tiến trình:\n\n\t\t (");
+		System.out.print(TimeTB + ")/" + list.size() + " = " + sum + "/" + list.size() + " = " + (sum / list.size()));
+		System.out.println();
+		System.out.println();
+
+//		{-----------------------------------------------------------------------------------------------------------------------}
+
+		sum = 0;
+		TimeTB = "";
+		System.out.println("\t\t===============Thời gian xử lý TB của hệ tiến trình================\n");
+		for (int i = 0; i < list.size(); i++) {
+			int finish = list.get(i).getTime_Finish();
+			System.out.println("\t\t-Thời gian xử lý của P" + list.get(i).getIndex() + " =  " + finish + " - "
+					+ list.get(i).getTxh() + " = " + (finish - list.get(i).getTxh()));
+			sum += (finish - list.get(i).getTxh());
+			if (i != list.size() - 1)
+				TimeTB += (finish - list.get(i).getTxh()) + " + ";
+			else
+				TimeTB += (finish - list.get(i).getTxh());
+		}
+		System.out.print("\n\t\tThời gian đợi trung bình của hệ tiến trình:\n\n\t\t (");
+		System.out.print(TimeTB + ")/" + list.size() + " = " + sum + "/" + list.size() + " = " + (sum / list.size()));
+		System.out.println();
+		System.out.println();
+	}
+
+	public static void nhap() {
+		// -------------------------------------MENU-----------------------------------------
+		int chose;
+		System.out.println("\t\t-----------------------------------------");
+		System.out.println("\t\t|\t1.FCFS bình thường\t\t|");
+		System.out.println("\t\t|\t2.FCFS trường hợp nhanh nhất\t|");
+		System.out.println("\t\t|\t3.FCFS trường hợp chậm nhất\t|");
+		System.out.println("\t\t-----------------------------------------");
+		do {
+			System.out.print("\n\tNhập lựa chọn của bạn => ");
+			chose = sc.nextInt();
+			if (chose<=0||chose>3)
+				System.out.println("\t\tKhông hợp lệ, vui lòng nhập lại trong khoảng {1,2,3}");
+		}while (chose<=0||chose>3);
+		//chose = 1,2,3
+		// ------------------------------------END_MENU---------------------------------------
+		int n;
+		do {
+			System.out.print("\n\tNhập số tiến trình: ");
+			n = sc.nextInt();
+			if (n < 2)
+				System.out.println("Nhập lại số tiến trình phải >=2");
+		} while (n < 2);
+		switch(chose) {
+			case 1:
+				get_Data_Normal(n);
+				break;
+			case 2:
+				get_Data_Quick_Slow(n);
+				break;
+			case 3:
+				get_Data_Quick_Slow(n);
+				break;
+		}
+	}
+	public static void get_Data_Normal(int n) {//nhập thông tin cho tiến trình bình thường
+		TienTrinh temp;
+		for (int i = 0; i < n; i++) {
+			temp = new TienTrinh();
+			System.out.println("\t==========Nhập tiến trình thứ " + (i + 1) + " ===========");
+			temp.setIndex(i);
+			int k;
+			do {
+				System.out.print("\nNhập thời gian xuất hiện của tiến trình: ");
+				k = sc.nextInt();
+				if (k >= 0)
+					temp.setTxh(k);
+				else
+					System.out.println("\tKhông hợp lệ, phải >= 0, nhập lại!");
+			} while (k < 0);
+			do {
+				System.out.print("\nNhập thời gian thực hiện của tiến trình (CPUB): ");
+				if (k > 0)
+					temp.setCPUb(k);
+				else
+					System.out.println("\tKhông hợp lệ, CPUB > 0, nhập lại!");
+			} while (k <= 0);
+			list.add(temp);
+		}
+	}
+	public static void get_Data_Quick_Slow(int n) {//Khóa cột Txh
+		TienTrinh temp;
+		for (int i = 0; i < n; i++) {
+			temp = new TienTrinh();
+			System.out.println("\t==========Nhập tiến trình thứ " + (i + 1) + " ===========");
+			temp.setIndex(i);
+			int k;
+			temp.setTxh(0);
+			do {
+				k = sc.nextInt();
+				System.out.print("\nNhập thời gian thực hiện của tiến trình (CPUB): ");
+				if (k > 0)
+					temp.setCPUb(k);
+				else
+					System.out.println("\tKhông hợp lệ, CPUB > 0, nhập lại!");
+			} while (k <= 0);
+			list.add(temp);
+		}
+	}
+	public static void showTable() {
+		System.out.println("\t\t-------------------------------------------------");
+		System.out.print("\t\t|");
+		System.out.printf("\t%3s%12s%10s%8s", "STT", "Tiến trình", "CPUBtime", "Timexh");
+		System.out.print("\t|");
+		System.out.println();
+		for (int i = 0; i < list.size(); i++) {
+			TienTrinh x = list.get(i);
+			System.out.print("\t\t|");
+			System.out.printf("\t%3s%12s%10s%8s", (i + 1) + ".", "P" + x.getIndex(), x.getCPUb(), x.getTxh());
+			System.out.print("\t|");
+			System.out.println();
+		}
+		System.out.println("\t\t-------------------------------------------------");
+	}
+
+	public static boolean check() {// TH ĐB: tất cả Txh = nhau ( coi như = 0 )
+		for (int i = 1; i < list.size(); i++) {
+			if (list.get(i).getTxh() != list.get(0).getTxh())
+				return false;
+		}
+		return true;
+	}
+
+	public static void sortByTxh() {
+		for (int i = 0; i < list.size() - 1; i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				if (list.get(i).getTxh() > list.get(j).getTxh()) {
+					TienTrinh x = list.get(i);
+					list.set(i, list.get(j));
+					list.set(j, x);
+				}
+			}
+		}
+	}
+
+	public static void sortByCPUb() {
+		for (int i = 0; i < list.size() - 1; i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				if (list.get(i).getCPUb() > list.get(j).getCPUb()) {
+					TienTrinh x = list.get(i);
+					list.set(i, list.get(j));
+					list.set(j, x);
+				}
+			}
+		}
+	}
+}
