@@ -10,8 +10,8 @@ public class Main {
 		// input
 		int chose = inputData();// chose = 1: FCFS_Normal, 2: FCFS_Fastest, 3: FCFS_Slowest
 		// -----------------------------------
-//		list.add(new TienTrinh(8, 5, 1));
-//		list.add(new TienTrinh(1, 16, 2));
+//		list.add(new TienTrinh(8, 5, 0));
+//		list.add(new TienTrinh(1, 16, 1));
 //		list.add(new TienTrinh(6, 6, 3));
 //		list.add(new TienTrinh(2, 14, 4));
 //		list.add(new TienTrinh(5, 8, 5));
@@ -19,13 +19,15 @@ public class Main {
 //		list.add(new TienTrinh(11, 3, 7));
 //		list.add(new TienTrinh(15, 0, 8));
 //		list.add(new TienTrinh(5, 9, 9));
-//		list.add(new TienTrinh(12, 2, 10));
+//		list.add(new TienTrinh(12, 2, 2));
+//		list.add(new TienTrinh(5, 7, 10));
+//		list.add(new TienTrinh(9, 4, 11));
 		// ------------------------------------
 		// end input
 		FCFS(chose);
 	}
 
-	public static void FCFS(int chose) {//Xử lý lập lịch Firt Come First Served
+	public static void FCFS(int chose) {// Xử lý lập lịch Firt Come First Served
 		switch (chose) {
 		case 1:
 			FCFS_Normal();
@@ -74,7 +76,7 @@ public class Main {
 		TienTrinh temp;
 		for (int i = 0; i < n; i++) {
 			temp = new TienTrinh();
-			System.out.println("\t==========Nhập tiến trình thứ " + (i + 1) + " ===========");
+			System.out.println("\t\n==========Nhập tiến trình thứ " + (i + 1) + " ===========");
 			temp.setIndex(i);
 			int k;
 			do {
@@ -149,7 +151,58 @@ public class Main {
 		System.out.println("\t\t-----------------------------------------");
 	}
 
-	public static void FCFS_Normal() { //Trường hợp FCFS bình thường
+	public static void Gantt() {
+		int n = list.size();
+		int k = n, p = k, i = 0, T = list.get(0).getTxh(), T1 = T, j = 0, z = 0;
+		int d = k / 10;
+		if (k % 10 != 0)
+			d++;
+		while (i < d) {
+			int dem = 0;
+			System.out.printf("\t%4s", "|");
+			// viet ra p
+			while (j < k) {
+				if (dem == 10)
+					break;
+				dem++;
+				if (list.get(j).getTxh() <= T1) {
+					System.out.printf("%4s", "P" + list.get(j).getIndex());
+					System.out.printf("%4s", "|");
+					T1 += list.get(j).getCPUb();
+					j++;
+				} else {
+					p++;
+					System.out.printf("%8s", "|");
+					T1 = list.get(j).getTxh();
+				}
+			}
+			dem = 0;
+			System.out.println();
+			System.out.printf("\t%4s", T);
+			// viet thoi gian
+			while (z < k) {
+				if (dem == 10)
+					break;
+				dem++;
+				if (list.get(z).getTxh() <= T) {
+					T += list.get(z).getCPUb();
+					System.out.printf("%8s", T);
+					z++;
+				} else {
+					T = list.get(z).getTxh();
+					System.out.printf("%8s", T);
+				}
+			}
+			i++;
+			int b = p / 10;
+			if (p % 10 != 0)
+				b++;
+			d = b;
+			System.out.println();
+		}
+	}
+
+	public static void FCFS_Normal() { // Trường hợp FCFS bình thường
 		int Txh = 0, Tkt = 0, index = 0;
 		System.out
 				.println("\n\n\t=================================LẬP LỊCH CPU FCFS================================\n");
@@ -159,14 +212,13 @@ public class Main {
 		sortUpByTxh();// sắp xếp bảng tiến trình tăng dần theo Txh
 		showTable_Normal();
 		System.out.println("\tGiản đồ Gantt: \n");
-		System.out.print("\t|");
+		// System.out.print("\t|");
 		int n = list.size();
-		Txh = list.get(0).getTxh();// thời điểm đầu tiên là Txh của tiến trình xuất hiện đầu tiên
-		Tkt = Txh;
+		Txh = Tkt = list.get(0).getTxh();// thời điểm đầu tiên là Txh của tiến trình xuất hiện đầu tiên
 		for (int i = 0; i < n; i++) {// Duyệt danh sách tiến trình
 			Tkt += list.get(i).getCPUb(); // Thời điểm kết thúc = Thời điểm bđ + CPUBurtTime
 			index = list.get(i).getIndex();
-			System.out.print(Txh + " P" + index + " " + Tkt + "|");
+			// System.out.print(Txh + " P" + index + " " + Tkt + "|");
 			list.get(i).setTime_Start(Txh);// set thời điểm bắt đầu thực hiện của tiến trình Pi
 			list.get(i).setTime_Finish(Tkt);// set thời điểm kết thúc của tiến trình Pi
 			if (i + 1 < n && Tkt < list.get(i + 1).getTxh()) {// tiến trình sau chưa xuất hiện khi tiến trình Pi kthúc
@@ -174,6 +226,7 @@ public class Main {
 			}
 			Txh = Tkt; // set lại mốc bắt đầu cho tiến trình tiếp theo
 		}
+		Gantt();
 		System.out.println();
 		System.out.println();
 
@@ -186,6 +239,7 @@ public class Main {
 		for (int i = 0; i < list.size(); i++) {
 			start = list.get(i).getTime_Start(); // thời điểm bắt đầu của tiến trình
 			index = list.get(i).getIndex(); // Thứ tự của tiến trình (P0,P1..)
+//			System.out.print(Txh + " P" + index + " " + Tkt + "|");
 			Txh = list.get(i).getTxh(); // Thời điểm xuất hiện của tiến trình
 			System.out
 					.println("\t\t-Thời gian đợi của P" + index + " =  " + start + " - " + Txh + " = " + (start - Txh));
@@ -224,7 +278,7 @@ public class Main {
 
 	}
 
-	public static void FCFS_Fastest_Slowest(int chose) {//Trường hợp FCFS nhanh nhất hoặc chậm nhất
+	public static void FCFS_Fastest_Slowest(int chose) {// Trường hợp FCFS nhanh nhất hoặc chậm nhất
 		int Txh, Tkt, index;
 		if (chose == 2) {
 			System.out.println(
@@ -244,21 +298,22 @@ public class Main {
 		}
 		showTable_Fast_Slow();
 		System.out.println("\tGiản đồ Gantt: \n");
-		System.out.print("\t|");
+		// System.out.print("\t|");
 		int n = list.size();
 		Txh = 0;// thời điểm đầu tiên là 0
 		Tkt = Txh;
 		for (int i = 0; i < n; i++) {// Duyệt danh sách tiến trình
 			Tkt += list.get(i).getCPUb(); // Thời điểm kết thúc = Thời điểm bđ + CPUBurtTime
 			index = list.get(i).getIndex();
-			System.out.print(Txh + " P" + index + " " + Tkt + "|");
+
 			list.get(i).setTime_Start(Txh);// set thời điểm bắt đầu thực hiện của tiến trình Pi
 			list.get(i).setTime_Finish(Tkt);// set thời điểm kết thúc của tiến trình của tiến trình Pi
 			Txh = Tkt; // set lại mốc bắt đầu cho tiến trình tiếp theo
 		}
-		System.out.println();
-		System.out.println();
 
+		Gantt();
+		System.out.println();
+		System.out.println();
 //		{-----------------------------------------------------------------------------------------------------------------------}
 
 		System.out.println("\t\t===============Thời gian đợi TB của hệ tiến trình================\n");
